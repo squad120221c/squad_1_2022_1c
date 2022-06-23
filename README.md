@@ -20,3 +20,8 @@ Desplegar la app con el servidor uvicorn de manera local
 ```
 uvicorn src.main.controller:app
 ```
+# Despliegue de la app
+
+La app esta desplegada en Heroku junto con la base de datos PostgreSQL. 
+
+La API está desplegada en https://squad1-rrhh.herokuapp.com/docs 
