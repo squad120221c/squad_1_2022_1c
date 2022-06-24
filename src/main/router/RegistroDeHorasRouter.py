@@ -19,7 +19,7 @@ from src.main.schema import RegistroDeHorasSchema
 from src.main.service import RegistroDeHorasService
 
 # Importo la función para la conexión a la base de datos
-#from src.main.utils.db import get_db
+from src.main.utils.db import get_db
 
 # Genero una instancia de la clase APIRouter y la añdo un prefijo
 # para que todas las rutas creadas a partir de la instancia router 
@@ -32,7 +32,7 @@ router = APIRouter(prefix="/CargasDeHoras")
     tags=["Carga de Horas"], #Para agrupar los endpoints
     status_code=status.HTTP_201_CREATED,
     response_model=RegistroDeHorasSchema.RegistroDeHoras, # Indica que la respuesta que retornamos será un modelo de Pydantic
-    #dependencies=[Depends(get_db)], # Pasamos la conexión a la base de datos
+    dependencies=[Depends(get_db)], # Pasamos la conexión a la base de datos
     summary="Cargar horas en una tarea" # Esto es informativo para la documentación de la API
 )
 def create_trabajo(trabajoRealizado: RegistroDeHorasSchema.RegistroDeHorasCargar= Body(...)):
@@ -60,7 +60,7 @@ def create_trabajo(trabajoRealizado: RegistroDeHorasSchema.RegistroDeHorasCargar
     tags=["Carga de Horas"],
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
-    #dependencies=[Depends(get_db)],
+    dependencies=[Depends(get_db)],
     summary="Obtener todas las cargas de horas"
 )
 def get_cargas():
@@ -82,7 +82,7 @@ def get_cargas():
     tags=["Carga de Horas"],
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
-    #dependencies=[Depends(get_db)],
+    dependencies=[Depends(get_db)],
     summary="Obtener todas las cargas de horas de un proyecto"
 )
 def get_cargas_recurso(
@@ -109,7 +109,7 @@ def get_cargas_recurso(
     tags=["Carga de Horas"],
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
-    #dependencies=[Depends(get_db)],
+    dependencies=[Depends(get_db)],
     summary="Obtener todas las cargas de horas de una tarea"
 )
 def get_cargas_recurso(
@@ -136,7 +136,7 @@ def get_cargas_recurso(
     tags=["Carga de Horas"],
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
-    #dependencies=[Depends(get_db)],
+    dependencies=[Depends(get_db)],
     summary="Obtener todas las cargas de horas de un recurso"
 )
 def get_cargas_recurso(
@@ -156,14 +156,14 @@ def get_cargas_recurso(
     - Todas las cargas realizadas para el recurso ingresado
     """
 
-    return RegistroDeHorasService.get_cargas_tarea(codigo_recurso)
+    return RegistroDeHorasService.get_cargas_recurso(codigo_recurso)
 
 @router.put(
     "/{codigo_carga}",
     tags=["Carga de Horas"],
     status_code=status.HTTP_200_OK,
     response_model=RegistroDeHorasSchema.RegistroDeHorasCargar,
-    #dependencies=[Depends(get_db)],
+    dependencies=[Depends(get_db)],
     summary="Modificar registro de horas"
 )
 def update_carga(
@@ -178,7 +178,7 @@ def update_carga(
     tags=["Carga de Horas"],
     status_code=status.HTTP_200_OK,
     response_model=RegistroDeHorasSchema.RegistroDeHorasCargar,
-    #dependencies=[Depends(get_db)],
+    dependencies=[Depends(get_db)],
     summary="Aumentar horas cargadas"
 )
 def update_carga(
@@ -194,7 +194,7 @@ def update_carga(
     tags=["Carga de Horas"],
     status_code=status.HTTP_200_OK,
     response_model=RegistroDeHorasSchema.RegistroDeHorasCargar,
-    #dependencies=[Depends(get_db)],
+    dependencies=[Depends(get_db)],
     summary="Disminuir horas cargadas"
 )
 def update_carga(
@@ -209,7 +209,7 @@ def update_carga(
     "/{codigo_carga}",
     tags=["Carga de Horas"],
     status_code=status.HTTP_200_OK,
-    #dependencies=[Depends(get_db)]
+    dependencies=[Depends(get_db)]
 )
 def delete_task(
     codigo_carga: int = Path(

@@ -16,14 +16,14 @@ db_state = ContextVar("db_state", default=db_state_default.copy())
 
 # Sobreescribimos la clase PeeweeConnectionState, esto se hace por el asincronismo
 class PeeweeConnectionState(peewee._ConnectionState):
-    def _init_(self, **kwargs):
-        super()._setattr_("_state", db_state)
-        super()._init_(**kwargs)
+    def __init__(self, **kwargs):
+        super().__setattr__("_state", db_state)
+        super().__init__(**kwargs)
 
-    def _setattr_(self, name, value):
+    def __setattr__(self, name, value):
         self._state.get()[name] = value
 
-    def _getattr_(self, name):
+    def __getattr__(self, name):
         return self._state.get()[name]
 
 #Nos conectamos a la base de datos empleando los parámetros de autenticación y conexión.
