@@ -45,17 +45,19 @@ def get_tarea_id(idTarea: int):
                     collaborators = tarea.get("collaborators")
             )
         
-    if tarea_id == None:
-        msg = "El id ingresado no corresponde a ningúna tarea existente"
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=msg
-        )
+    # if tarea_id == None:
+    #     msg = "El id ingresado no corresponde a ningúna tarea existente"
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST,
+    #         detail=msg
+    #     )
 
     return tarea_id    
 
 def tareaTieneAsignado(idTarea: int, idRecurso: int):
     tarea = get_tarea_id(idTarea)    
+    if tarea == None:
+        return False
     tieneAsignado = False
     for recurso in tarea.collaborators:
         if recurso == idRecurso:

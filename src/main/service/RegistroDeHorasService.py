@@ -1,15 +1,25 @@
+import json
 from fastapi import HTTPException, status
+from src.main.exceptions.RecursoNoAsignado import RecursoNoAsignado
 
 # Importo el modelo de peewee para poder crear un trabajo
 from src.main.model.RegistroDeHorasModel import RegistroDeHoras as RegistroDeHorasModel 
 # Importo el modelo de Pydantic para retornar al trabajo la informaición del trabajo creado
 from src.main.schema import RegistroDeHorasSchema 
 # from src.main.schema import TareaSchema
+from src.main.service import TareaService
 
 # Función que se encargará de guardar el trabajoRealizado en la base de datos
 # Recibe como parámetro un modelo de Pydantic de tipo TrabajoRealizado
 def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHorasCargar):
 
+    if TareaService.tareaTieneAsignado(carga.codigo_tarea, carga.codigo_recurso):
+        msg = "El recurso no está asignado a la tarea"
+        raise RecursoNoAsignado(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=msg
+        )
+    
     # Primero compruebo que la carga de horas no exista ya en la base de datos
     # Si es asi lanzo una excepción HTTPException con el código de estado 400 con un mensaje
     getCarga = RegistroDeHorasModel.filter((RegistroDeHorasModel.codigo_recurso == carga.codigo_recurso) 
@@ -37,12 +47,15 @@ def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHorasCargar):
     db_carga.save()
 
     #Retorno la información del trabajo recién creado empleando el modelo de Pydantic
-    return RegistroDeHorasSchema.RegistroDeHoras(
+    return RegistroDeHorasSchema.RegistroDeHorasCargar(
         nombre_proyecto = db_carga.nombre_proyecto,
         nombre_tarea = db_carga.nombre_tarea,
         nombre_recurso = db_carga.nombre_recurso,
-        fecha_trabajada=db_carga.fecha_trabajada,
+        fecha_trabajada = db_carga.fecha_trabajada,
         cantidad = db_carga.cantidad,
+        codigo_proyecto = db_carga.codigo_proyecto,
+        codigo_tarea = db_carga.codigo_tarea,
+        codigo_recurso = db_carga.codigo_recurso,
         codigo_carga = db_carga.codigo_carga
     )
 
@@ -56,13 +69,16 @@ def listar_cargas(cargas, msg):
     list_cargas = []
     for carga in cargas:
         list_cargas.append(
-            RegistroDeHorasSchema.RegistroDeHoras(
+            RegistroDeHorasSchema.RegistroDeHorasCargar(
                 nombre_proyecto=carga.nombre_proyecto,
                 nombre_tarea=carga.nombre_tarea,
                 nombre_recurso=carga.nombre_recurso,
                 cantidad=carga.cantidad,
                 fecha_trabajada=carga.fecha_trabajada,
-                codigo_carga=carga.codigo_carga               
+                codigo_carga=carga.codigo_carga,
+                codigo_proyecto = carga.codigo_proyecto,
+                codigo_tarea = carga.codigo_tarea,
+                codigo_recurso = carga.codigo_recurso
             )
         )
 
@@ -84,7 +100,7 @@ def get_cargas_tarea(codigo: int):
     cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.codigo_tarea == codigo)
     return listar_cargas(cargas, "La tarea ingresada no tiene horas cargadas")
 
-def get_cargas_recurso(codigo: int):
+def get_cargas_tarea(codigo: int):
     cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.codigo_recurso == codigo)
     return listar_cargas(cargas, "El recurso ingresado no tiene horas cargadas")
 
@@ -157,11 +173,11 @@ def delete_carga(codigo_carga: int):
 
     carga.delete_instance()
 
-# def horasConsumidasDeRecurso(tarea: TareaSchema.Tarea, recurso: int):
-#     cargas = get_cargas()
-#     horasTotal = 0
-#     for carga in cargas:
-#         if carga.recurso.legajo == recurso:
-#             horasTotal = horasTotal + carga.cantidad
+def horasConsumidasDeRecurso(idTarea: int, legajo: int):
+    cargas = get_cargas()
+    horasTotal = 0
+    for carga in cargas:
+        if carga.codigo_recurso == legajo & carga.codigo_tarea == idTarea:
+            horasTotal = horasTotal + carga.cantidad
 
-#     return horasTotal
+    return horasTotal

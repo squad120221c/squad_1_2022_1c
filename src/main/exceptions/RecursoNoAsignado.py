@@ -1,0 +1,2 @@
+class RecursoNoAsignado(Exception):
+    pass

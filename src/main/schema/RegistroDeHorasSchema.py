@@ -1,16 +1,8 @@
-# Modelo de Pydantic
-
-# Todas las variables que definamos dentro de la clase que extienda de BaseModel, 
-# pasará por un proceso de validación y si hay algún error lanzará una excepción.
-
-# Importamos la función Field. Esta función nos permite validar distintos tipos de datos, 
-# marcar si es obligatorio o no, tamaños máximos y mínimos, etc.
-
 from datetime import date
 from pydantic import BaseModel
 from pydantic import Field
 
-class RegistroDeHorasBase(BaseModel):
+class RegistroDeHoras(BaseModel):
     nombre_proyecto: str = Field(
         ...,
         example="Proyecto 1"
@@ -32,13 +24,7 @@ class RegistroDeHorasBase(BaseModel):
         example="6"
     )
 
-class RegistroDeHoras(RegistroDeHorasBase):
-    codigo_carga: int = Field(
-        ...,
-        example="5"
-    )
-
-class RegistroDeHorasCargar(RegistroDeHorasBase):
+class RegistroDeHorasCargar(RegistroDeHoras):
     codigo_proyecto: int = Field(
         ...,
         example = "3"
@@ -50,4 +36,8 @@ class RegistroDeHorasCargar(RegistroDeHorasBase):
     codigo_recurso: int = Field(
         ...,
         example="32"
+    )
+    codigo_carga: int = Field(
+        ...,
+        example="5"
     )
