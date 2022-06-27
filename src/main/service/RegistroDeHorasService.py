@@ -1,7 +1,7 @@
 import json
 from fastapi import HTTPException, status
 from src.main.exceptions.RecursoNoAsignado import RecursoNoAsignado
-
+from src.main.exceptions.RegistroNoExiste import RegistroNoExiste
 # Importo el modelo de peewee para poder crear un trabajo
 from src.main.model.RegistroDeHorasModel import RegistroDeHoras as RegistroDeHorasModel 
 # Importo el modelo de Pydantic para retornar al trabajo la informaición del trabajo creado
@@ -61,10 +61,7 @@ def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHorasCargar):
 
 def listar_cargas(cargas, msg):
     if not cargas:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=msg
-        )
+        raise RegistroNoExiste()
 
     list_cargas = []
     for carga in cargas:
@@ -100,7 +97,7 @@ def get_cargas_tarea(codigo: int):
     cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.codigo_tarea == codigo)
     return listar_cargas(cargas, "La tarea ingresada no tiene horas cargadas")
 
-def get_cargas_tarea(codigo: int):
+def get_cargas_recurso(codigo: int):
     cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.codigo_recurso == codigo)
     return listar_cargas(cargas, "El recurso ingresado no tiene horas cargadas")
 
@@ -166,10 +163,7 @@ def delete_carga(codigo_carga: int):
     carga = RegistroDeHorasModel.filter(RegistroDeHorasModel.codigo_carga == codigo_carga).first()
 
     if not carga:
-         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="La carga de horas con el código ingresado no existe"
-        )
+         raise RegistroNoExiste()
 
     carga.delete_instance()
 

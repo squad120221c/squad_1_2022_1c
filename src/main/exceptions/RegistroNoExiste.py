@@ -1,0 +1,2 @@
+class RegistroNoExiste(Exception):
+    pass
