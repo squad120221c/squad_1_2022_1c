@@ -6,11 +6,11 @@ class Recurso(BaseModel):
         ...,
         example= "1"
     )
-    Nombre: str = Field(
+    nombre: str = Field(
         ...,
         example="Juan"
     )
-    Apellido: str = Field(
+    apellido: str = Field(
         ...,
         example="Perez"
     )

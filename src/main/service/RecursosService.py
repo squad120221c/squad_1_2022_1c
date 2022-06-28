@@ -1,6 +1,5 @@
 from fastapi import HTTPException, status
 import requests
-import os
 
 from src.main.schema import RecursoSchema
 
@@ -20,8 +19,8 @@ def get_recursos():
         listaRecursos.append(
             RecursoSchema.Recurso(
                 legajo = recurso.get("legajo"),
-                Nombre = recurso.get("Nombre"),
-                Apellido = recurso.get("Apellido")
+                nombre = recurso.get("Nombre"),
+                apellido = recurso.get("Apellido")
             )
         )
 
@@ -42,9 +41,9 @@ def get_recurso_legajo(legajo: int):
     for recurso in recursos:
         if recurso.get("legajo") == legajo:
             recurso_legajo = RecursoSchema.Recurso(
-                    legajo = recurso.get("legajo"),
-                    Nombre = recurso.get("Nombre"),
-                    Apellido = recurso.get("Apellido")
+                legajo = recurso.get("legajo"),
+                nombre = recurso.get("Nombre"),
+                apellido = recurso.get("Apellido")
             )
         
     if recurso_legajo == None:
@@ -54,4 +53,4 @@ def get_recurso_legajo(legajo: int):
             detail=msg
         )
 
-    return recurso_legajo   
+    return recurso_legajo    

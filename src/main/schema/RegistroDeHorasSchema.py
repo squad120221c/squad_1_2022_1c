@@ -2,7 +2,7 @@ from datetime import date
 from pydantic import BaseModel
 from pydantic import Field
 
-class RegistroDeHoras(BaseModel):
+class RegistroDeModificar(BaseModel):    
     nombre_proyecto: str = Field(
         ...,
         example="Proyecto 1"
@@ -15,29 +15,31 @@ class RegistroDeHoras(BaseModel):
         ...,
         example="Recurso 1"
     )
-    fecha_trabajada: date = Field(
+    id_proyecto: int = Field(
         ...,
-        example="yyyy-mm-dd"
+        example = "3"
+    )
+    id_tarea: int = Field(
+        ...,
+        example="67"
+    )
+    id_recurso: int = Field(
+        ...,
+        example="32"
     )
     cantidad: int = Field(
         ...,
         example="6"
     )
 
+class RegistroDeHoras(RegistroDeModificar):
+    fecha_trabajada: date = Field(
+        ...,
+        example="yyyy-mm-dd"
+    )
+
 class RegistroDeHorasCargar(RegistroDeHoras):
-    codigo_proyecto: int = Field(
-        ...,
-        example = "3"
-    )
-    codigo_tarea: int = Field(
-        ...,
-        example="67"
-    )
-    codigo_recurso: int = Field(
-        ...,
-        example="32"
-    )
-    codigo_carga: int = Field(
+    id_registro_horas: int = Field(
         ...,
         example="5"
     )

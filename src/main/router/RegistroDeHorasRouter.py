@@ -1,222 +1,250 @@
-# Ruta para la creación de Trabajos, para cargar horas
-
-#APIRouter nos permite crear rutas a nuestra API
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import status
-# Para recuperar información que envíe el usuario en la petición para cargar las horas
 from fastapi import Body
-# Este lo usaremos cuando queramos capturar parámetros vía query en la url
-# En una url serían los que se envían después del carácter `?`
 from fastapi import Query
-# Lo utilizaremos para capturar parámetros que estén dentro de la url del endpoint
 from fastapi import Path
-from typing import List, Optional
 
-#Importo el modelo de Pydantic
 from src.main.schema import RegistroDeHorasSchema
-#Importo el servicio
 from src.main.service import RegistroDeHorasService
 
-# Importo la función para la conexión a la base de datos
 from src.main.utils.db import get_db
 
-# Genero una instancia de la clase APIRouter y la añdo un prefijo
-# para que todas las rutas creadas a partir de la instancia router 
-# lo tengan
-router = APIRouter(prefix="/CargasDeHoras")
+router = APIRouter(prefix="/rrhh")
 
-# endpoint
 @router.post(
     "/",
-    tags=["Carga de Horas"], #Para agrupar los endpoints
+    tags=["rrhh"],
     status_code=status.HTTP_201_CREATED,
-    response_model=RegistroDeHorasSchema.RegistroDeHoras, # Indica que la respuesta que retornamos será un modelo de Pydantic
-    dependencies=[Depends(get_db)], # Pasamos la conexión a la base de datos
-    summary="Cargar horas en una tarea" # Esto es informativo para la documentación de la API
+    response_model=RegistroDeHorasSchema.RegistroDeHorasCargar,
+    dependencies=[Depends(get_db)],
+    summary="Cargar horas en una tarea" 
 )
-def create_trabajo(trabajoRealizado: RegistroDeHorasSchema.RegistroDeHorasCargar= Body(...)):
+def create_trabajo(trabajoRealizado: RegistroDeHorasSchema.RegistroDeHoras= Body(...)):
     """
-    ## Cargar horas de un recurso a una tarea
+    ## Registrar carga de horas
 
-    ### Argumentos
-    La app recibe los siguientes campos dentro de un JSON
-    - cantidad: Horas del recurso a cargar en la tarea
-    - fecha_trabajada: Una fecha valida del pasado
-    - codigo_tarea: Código único de la tarea (Numérico)
-    - codigo_recurso: Código único que identifica un recurso (Numérico)
-
+    ### Argumentos:
+    - Nombre del proyecto
+    - Nombre de la tarea
+    - Nombre del recurso
+    - Identificador único del proyecto
+    - Identificador único de la tarea
+    - Identificador único del recurso
+    - Fecha en la que se registran las horas
+    - Cantidad de horas que se registran
+  
     ### Retorna
-    - trabajoRealizado: Información de la carga de horas 
+    - El registro cargado y su identificador único en formato JSON
     """
 
-    # Llamo a la función create_trabajo que definí en el archivo TrabajoRealizadoService.py 
-    # y envio por parámetro la variable trabajoRealizado. Esta retornará el modelo TrabajoRealizado 
-    # de Pydantic que definimos en trabajoRealizadoSchema.py
     return RegistroDeHorasService.cargarHoras(trabajoRealizado)
 
 @router.get(
     "/",
-    tags=["Carga de Horas"],
+    tags=["rrhh"],
     status_code=status.HTTP_200_OK,
-    response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
+    response_model=list[RegistroDeHorasSchema.RegistroDeHorasCargar],
     dependencies=[Depends(get_db)],
     summary="Obtener todas las cargas de horas"
 )
 def get_cargas():
 
     """
-    ## Obtener todas las cargas de horas de un recurso a partir de su código
+    ## Obtener todos los registros de horas
 
     ### Argumentos
-    No recibe argumentos
+    - No recibe argumentos
 
     ### Retorna
-    - Todas las cargas realizadas
+    - Todas las cargas realizadas en formato JSON
     """
 
     return RegistroDeHorasService.get_cargas()
 
 @router.get(
-    "/proyecto/{codigo_proyecto}",
-    tags=["Carga de Horas"],
+    "/proyecto/{id_proyecto}",
+    tags=["rrhh"],
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
     dependencies=[Depends(get_db)],
-    summary="Obtener todas las cargas de horas de un proyecto"
+    summary="Obtener todas los registros de horas de un proyecto"
 )
 def get_cargas_recurso(
-    codigo_proyecto: int = Path(
+    id_proyecto: int = Path(
         ...,
     ),
 ):
 
     """
-    ## Obtener todas las cargas de horas por proyecto a partir de su código
+    ## Obtener todas los registros de un proyecto por proyecto a partir de su identificador único
 
     ### Argumentos
-    La app recibe los siguientes campos a través del url
-    - codigo_proyecto: Código único que identifica un proyecto
+    - Identificador único del proyecto
 
     ### Retorna
-    - Todas las cargas realizadas
+    - Todas los registros realizados en el proyecto en formato JSON
     """
 
-    return RegistroDeHorasService.get_cargas_proyecto(codigo_proyecto)
+    return RegistroDeHorasService.get_cargas_proyecto(id_proyecto)
 
 @router.get(
-    "/tarea/{codigo_tarea}",
-    tags=["Carga de Horas"],
+    "/tarea/{id_tarea}",
+    tags=["rrhh"],
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
     dependencies=[Depends(get_db)],
-    summary="Obtener todas las cargas de horas de una tarea"
+    summary="Obtener todas los registros de horas de una tarea"
 )
 def get_cargas_recurso(
-    codigo_tarea: int = Path(
+    id_tarea: int = Path(
         ...,
     ),
 ):
 
     """
-    ## Obtener todas las cargas de horas por tarea a partir de su código
+    ## Obtener todas loss registros de horas por tarea a partir de su identificador único
 
     ### Argumentos
-    La app recibe los siguientes campos a través del url
-    - codigo_tarea: Código único que identifica un proyecto
+    - Identificador único de la tarea
 
     ### Retorna
-    - Todas las cargas realizadas para la tarea ingresada
+    - Todas los registros realizadas para la tarea en formato JSON
     """
 
-    return RegistroDeHorasService.get_cargas_tarea(codigo_tarea)
+    return RegistroDeHorasService.get_cargas_tarea(id_tarea)
 
 @router.get(
-    "/recurso/{codigo_recurso}",
-    tags=["Carga de Horas"],
+    "/recurso/{id_recurso}",
+    tags=["rrhh"],
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
     dependencies=[Depends(get_db)],
-    summary="Obtener todas las cargas de horas de un recurso"
+    summary="Obtener todos los registros de horas de un recurso"
 )
 def get_cargas_recurso(
-    codigo_recurso: int = Path(
+    id_recurso: int = Path(
         ...,
     ),
 ):
 
     """
-    ## Obtener todas las cargas de horas por recurso a partir de su código
+    ## Obtener todos los registros para un recurso a partir de su identificador único
 
     ### Argumentos
-    La app recibe los siguientes campos a través del url
-    - codigo_recurso: Código único que identifica un recurso
+    - Identificador único del recurso
 
     ### Retorna
-    - Todas las cargas realizadas para el recurso ingresado
+    - Todas los registros realizados para el proyecto en formato JSON
     """
 
-    return RegistroDeHorasService.get_cargas_recurso(codigo_recurso)
+    return RegistroDeHorasService.get_cargas_recurso(id_recurso)
 
 @router.put(
-    "/{codigo_carga}",
-    tags=["Carga de Horas"],
+    "/{id_registro_horas}",
+    tags=["rrhh"],
     status_code=status.HTTP_200_OK,
     response_model=RegistroDeHorasSchema.RegistroDeHorasCargar,
     dependencies=[Depends(get_db)],
     summary="Modificar registro de horas"
 )
 def update_carga(
-    codigo_carga: int = Path(
+    id_registro_horas: int = Path(
         ...,
-    ), carga: RegistroDeHorasSchema.RegistroDeHorasCargar = Body(...)
+    ), carga: RegistroDeHorasSchema.RegistroDeModificar = Body(...)
 ):
-    return RegistroDeHorasService.modificar_carga(codigo_carga, carga)
+
+    """
+    ## Modificar un registro de horas
+    ### No se podrá modificar la fecha de la misma
+
+    ### Argumentos
+    - Nombre del proyecto
+    - Nombre de la tarea
+    - Nombre del recurso
+    - Identificador único del proyecto
+    - Identificador único de la tarea
+    - Identificador único del recurso
+    - Cantidad de horas que se registran
+    ### Retorna
+    - El registro modificado con los nuevos datos en formato JSON
+    """
+    return RegistroDeHorasService.modificar_carga(id_registro_horas, carga)
 
 @router.put(
-    "/{codigo_carga}/aumentar",
-    tags=["Carga de Horas"],
+    "/{id_registro_horas}/aumentar",
+    tags=["rrhh"],
     status_code=status.HTTP_200_OK,
     response_model=RegistroDeHorasSchema.RegistroDeHorasCargar,
     dependencies=[Depends(get_db)],
-    summary="Aumentar horas cargadas"
+    summary="Aumentar horas de un registro"
 )
 def update_carga(
-    codigo_carga: int = Path(
+    id_registro_horas: int = Path(
         ...,
     ),
-    cantidad: int = Query(None)
+    cantidad: int = Path(
+        ...,
+    )
 ):
-    return RegistroDeHorasService.modificar_horas_cargadas(True, codigo_carga, cantidad)
+
+    """
+    ## Modificar un registro de horas
+    ### Solo se permiten cantidad de horas positivas
+
+    ### Argumentos
+    - Cantidad de horas que se quieran aumentar
+    ### Retorna
+    - El registro modificado con la cantidad de horas aumentada en formato JSON
+    """
+
+    return RegistroDeHorasService.modificar_horas_cargadas(True, id_registro_horas, cantidad)
 
 @router.put(
-    "/{codigo_carga}/disminuir",
-    tags=["Carga de Horas"],
+    "/{id_registro_horas}/disminuir",
+    tags=["rrhh"],
     status_code=status.HTTP_200_OK,
     response_model=RegistroDeHorasSchema.RegistroDeHorasCargar,
     dependencies=[Depends(get_db)],
     summary="Disminuir horas cargadas"
 )
 def update_carga(
-    codigo_carga: int = Path(
+    id_registro_horas: int = Path(
         ...,
     ),
-    cantidad: int = Query(None)
+    cantidad: int = Path(
+        ...,
+    )
 ):
-    return RegistroDeHorasService.modificar_horas_cargadas(False, codigo_carga, cantidad)
+    """
+    ## Modificar un registro de horas
+    ### Solo se permiten cantidad de horas positivas
+
+    ### Argumentos
+    - Cantidad de horas que se quieran disminuir
+    ### Retorna
+    - El registro modificado con la cantidad de horas disminuida en formato JSON
+    """
+
+    return RegistroDeHorasService.modificar_horas_cargadas(False, id_registro_horas, cantidad)
 
 @router.delete(
-    "/{codigo_carga}",
-    tags=["Carga de Horas"],
+    "/{id_registro_horas}",
+    tags=["rrhh"],
     status_code=status.HTTP_200_OK,
-    dependencies=[Depends(get_db)]
+    dependencies=[Depends(get_db)],
+    summary="Eliminar un registro de horas"
 )
 def delete_task(
-    codigo_carga: int = Path(
+    id_registro_horas: int = Path(
         ...,
     ),
 ):
-    RegistroDeHorasService.delete_carga(codigo_carga)
+    """
+    ## Eliminar un registro de horas
+    """
+
+    RegistroDeHorasService.delete_carga(id_registro_horas)
 
     return {
         'msg': 'La carga de horas se ha eliminado correctamente'

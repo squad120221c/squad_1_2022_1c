@@ -14,31 +14,30 @@ Feature: carga de horas de recurso
       | 9         | 2             | 3        | 2021-06-08 |
       | 43        | 3             | 8        | 2021-06-01 |
 
-#   Scenario Outline: no se pueden cargar horas a una tarea de un recurso que no tiene asignado
-#     Given un recurso con ID <idRecurso> 
-#     And una tarea con ID <idTarea>
-#     And el recurso no está asignado a la tarea
-#     When intento cargar <cantidad> horas trabajadas del recurso a la tarea para la fecha <fecha>
-#     Then la carga debe ser denegada
-#     And la tarea tendrá 0 horas consumidas del recurso
+  Scenario Outline: no se pueden cargar horas a una tarea de un recurso que no tiene asignado
+    Given un recurso con ID <idRecurso> 
+    And una tarea con ID <idTarea>
+    And el recurso no está asignado a la tarea
+    When intento cargar <cantidad> horas trabajadas del recurso a la tarea para la fecha <fecha>
+    Then la carga debe ser denegada
+    And la tarea tendrá 0 horas consumidas del recurso
 
-# #   Examples:
-# #       | idRecurso | idTarea | tituloTarea   | cantidad | fecha      |
-# #       | 12        | 23      | "Refactorizar"| 1        | 5-12-2021  |
-# #       | 5         | 5       | "Debuggear"   | 2        | 7-10-2022  |
-# #       | 23        | 3       | "Testing"     | 7        | 14-05-2022 |
+  Examples:
+        | idRecurso | idTarea | cantidad | fecha      |
+        | 12        | 23      | 1        | 2021-12-05 |
+        | 5         | 5       | 2        | 2022-10-7  |
+        | 23        | 3       | 7        | 2022-05-14 |
 
-#   Scenario Outline: no se pueden cargar horas de un recurso a una tarea que no existe
-#     Given un recurso con ID <id>
-#     And el recurso realiza un trabajo sobre una tarea que no existe
-#     When intento cargar <cantidad> horas trabajadas a una tarea que no existe para la fecha <fecha>
-#     Then la carga debe ser denegada por ingresar mal la tarea
+  Scenario Outline: no se pueden cargar horas de un recurso a una tarea que no existe
+    Given un recurso con ID <id>
+    When intento cargar <cantidad> horas trabajadas a una tarea que no existe para la fecha <fecha>
+    Then la carga debe ser denegada por no seleccionar una tarea existente
 
-# #   Examples:
-# #       | id | cantidad | fecha      |
-# #       | 0  | 1        | 25-05-2022 |
-# #       | 1  | 0        | 07-01-2022 |
-# #       | 2  | 7        | 04-02-2022 |
+  Examples:
+    | id | cantidad | fecha      |
+    | 0  | 1        | 25-05-2022 |
+    | 1  | 0        | 07-01-2022 |
+    | 2  | 7        | 04-02-2022 |
 
 #   Scenario Outline: no se pueden cargar horas de un recurso que no existe a una tarea
 #     Given una tarea con título <tituloTarea>

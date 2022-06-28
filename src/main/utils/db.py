@@ -14,7 +14,6 @@ DB_PORT = settings.db_port
 db_state_default = {"closed": None, "conn": None, "ctx": None, "transactions": None}
 db_state = ContextVar("db_state", default=db_state_default.copy())
 
-# Sobreescribimos la clase PeeweeConnectionState, esto se hace por el asincronismo
 class PeeweeConnectionState(peewee._ConnectionState):
     def __init__(self, **kwargs):
         super().__setattr__("_state", db_state)
@@ -26,9 +25,6 @@ class PeeweeConnectionState(peewee._ConnectionState):
     def __getattr__(self, name):
         return self._state.get()[name]
 
-#Nos conectamos a la base de datos empleando los parámetros de autenticación y conexión.
-#db = peewee.PostgresqlDatabase('trabajorealizado', user=DB_USER, password=DB_PASS, host=DB_HOST, port=DB_PORT)
-
 db = peewee.PostgresqlDatabase(
     database='d6tsspah74ovki',
     user='vufmuvzgjqhbau',
@@ -38,8 +34,6 @@ db = peewee.PostgresqlDatabase(
   )
 
 db._state = PeeweeConnectionState()
-
-#Las siguientes funciones las utilizaremos para poder utilizar la conexión a la base de datos en todo nuestro proyecto
 
 async def reset_db_state():
     db._state._state.set(db_state_default.copy())

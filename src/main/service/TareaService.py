@@ -44,13 +44,6 @@ def get_tarea_id(idTarea: int):
                     name = tarea.get("name"),
                     collaborators = tarea.get("collaborators")
             )
-        
-    # if tarea_id == None:
-    #     msg = "El id ingresado no corresponde a ningúna tarea existente"
-    #     raise HTTPException(
-    #         status_code=status.HTTP_400_BAD_REQUEST,
-    #         detail=msg
-    #     )
 
     return tarea_id    
 
