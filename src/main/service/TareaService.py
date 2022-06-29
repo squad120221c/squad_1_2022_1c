@@ -1,11 +1,14 @@
 from fastapi import HTTPException, status
 import requests
-
+from src.main.exceptions.TareaNoExiste import TareaNoExiste
 from src.main.schema import TareaSchema
 
 def get_tareas():
 
-    tareas = requests.get("clhttps://aninfo-projects.herokuapp.com/api/v1/tasks").json()
+    try:
+        tareas = requests.get("clhttps://aninfo-projects.herokuapp.com/api/v1/tasks").json()
+    except:
+        return None
 
     if tareas == None:
         msg = "No hay tareas disponibles :("
@@ -27,11 +30,14 @@ def get_tareas():
 
 def get_tarea_id(idTarea: int):
 
-    tareas = requests.get("https://aninfo-projects.herokuapp.com/api/v1/tasks/").json()
+    try: 
+        tareas = requests.get("https://aninfo-projects.herokuapp.com/api/v1/tasks/").json()
+    except: 
+        return None
     
     if tareas == None:
         msg = "No existe una tarea con el id ingresado"
-        raise HTTPException(
+        raise TareaNoExiste and HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail=msg
         )
@@ -48,8 +54,9 @@ def get_tarea_id(idTarea: int):
     return tarea_id    
 
 def tareaTieneAsignado(idTarea: int, idRecurso: int):
-    tarea = get_tarea_id(idTarea)    
-    if tarea == None:
+    try: 
+        tarea = get_tarea_id(idTarea)    
+    except TareaNoExiste:
         return False
     tieneAsignado = False
     for recurso in tarea.collaborators:

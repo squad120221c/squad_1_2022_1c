@@ -1,30 +1,50 @@
+from datetime import date
 from fastapi import HTTPException, status
 
+from src.main.exceptions.FechaInvalida import FechaInvalida
+from src.main.exceptions.CargaInvalida import CargaInvalida
+from src.main.exceptions.TareaNoExiste import TareaNoExiste
 from src.main.exceptions.RegistroExistente import RegistroExistente
 from src.main.exceptions.RecursoNoAsignado import RecursoNoAsignado
 from src.main.exceptions.RegistroNoExiste import RegistroNoExiste
-from src.main.model.RegistroDeHorasModel import RegistroDeHoras as RegistroDeHorasModel 
+from src.main.exceptions.RecursoNoExiste import RecursoNoExiste
 
+from src.main.model.RegistroDeHorasModel import RegistroDeHoras as RegistroDeHorasModel 
 from src.main.schema import RegistroDeHorasSchema 
+
 from src.main.service import TareaService
+from src.main.service import RecursosService
 
 def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHoras):
 
-    if TareaService.tareaTieneAsignado(carga.id_tarea, carga.id_recurso):
-        msg = "El recurso no está asignado a la tarea"
-        raise RecursoNoAsignado(
+    fecha_actual = date.today()
+    if carga.fecha_trabajada > fecha_actual:
+        raise FechaInvalida
+
+    if carga.cantidad > 8 or carga.cantidad < 1:
+        raise CargaInvalida 
+   
+    if TareaService.get_tarea_id(carga.id_tarea) == None:
+        raise TareaNoExiste and HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail=msg
+            detail="La tarea ingresada no corresponde a ninguna tarea existente"
         )
+
+    if RecursosService.get_recurso_legajo(carga.id_recurso) == None:
+        raise RecursoNoExiste and HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="El legajo ingresado no corresponde a ningún recurso existente"
+        )
+
+    if TareaService.tareaTieneAsignado(carga.id_tarea, carga.id_recurso) == False:
+        msg = "El recurso no está asignado a la tarea"
+        raise RecursoNoAsignado
     
     getCarga = RegistroDeHorasModel.filter((RegistroDeHorasModel.id_recurso == carga.id_recurso) 
     and (RegistroDeHorasModel.id_tarea == carga.id_tarea) and (RegistroDeHorasModel.fecha_trabajada == carga.fecha_trabajada)).first()
     if getCarga:
         msg = "Ya se cargaron horas para la tarea, el recurso y la fecha seleccionada"
-        raise RegistroExistente and HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail=msg
-        )
+        raise RegistroExistente
 
     db_carga = RegistroDeHorasModel(
         nombre_proyecto = carga.nombre_proyecto,
@@ -53,7 +73,7 @@ def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHoras):
 
 def listar_cargas(cargas, msg):
     if not cargas:
-        raise RegistroNoExiste() and HTTPException(
+        raise RegistroNoExiste and HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
             detail=msg
         )
@@ -162,10 +182,22 @@ def delete_carga(id_registro_horas: int):
     carga.delete_instance()
 
 def horasConsumidasDeRecurso(idTarea: int, legajo: int):
-    cargas = get_cargas()
+    try:
+        cargas = get_cargas()
+    except:
+        return 0
+
     horasTotal = 0
     for carga in cargas:
         if carga.id_recurso == legajo & carga.id_tarea == idTarea:
             horasTotal = horasTotal + carga.cantidad
 
     return horasTotal
+
+def horasRegistradas(idRegistro: int):
+    try:
+        carga = get_cargas_id(idRegistro)
+    except:
+        return 0
+
+    return carga[0].cantidad

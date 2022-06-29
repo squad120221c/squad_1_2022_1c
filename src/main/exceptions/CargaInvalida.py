@@ -1,0 +1,2 @@
+class CargaInvalida(Exception):
+    pass

@@ -1,0 +1,2 @@
+class RecursoNoExiste(Exception):
+    pass
