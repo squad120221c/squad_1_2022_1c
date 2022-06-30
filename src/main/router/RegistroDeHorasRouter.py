@@ -144,7 +144,7 @@ def get_cargas_recurso(
     "/registro/{id_registro_horas}",
     tags=["rrhh"],
     status_code=status.HTTP_200_OK,
-    response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
+    response_model=RegistroDeHorasSchema.RegistroDeHoras,
     dependencies=[Depends(get_db)],
     summary="Obtener el registro de horas correspondiente al ID"
 )

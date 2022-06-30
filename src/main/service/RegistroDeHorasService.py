@@ -109,9 +109,25 @@ def get_cargas():
     cargas = RegistroDeHorasModel.select()
     return listar_cargas(cargas, "No hay cargas de horas registradas")
 
-def get_cargas_id(id: int):
-    cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_registro_horas == id)
-    return listar_cargas(cargas, "El registro ingresado no existe")
+def get_cargas_id(id_registro_horas: int):
+    carga = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_registro_horas == id_registro_horas).first()
+
+    if not carga:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="La carga de horas con el código ingresado no existe"
+        )
+
+    return RegistroDeHorasSchema.RegistroDeHoras(
+        nombre_proyecto=carga.nombre_proyecto,
+        nombre_recurso=carga.nombre_recurso,
+        nombre_tarea=carga.nombre_tarea,
+        cantidad=carga.cantidad,
+        fecha_trabajada=carga.fecha_trabajada,
+        id_proyecto=carga.id_proyecto,
+        id_recurso=carga.id_recurso,
+        id_tarea=carga.id_tarea
+    )
 
 def get_cargas_proyecto(id: int):
     cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_proyecto == id)
@@ -122,8 +138,16 @@ def get_cargas_tarea(id: int):
     return listar_cargas(cargas, "La tarea ingresada no tiene horas cargadas")
 
 def get_cargas_recurso(id: int):
-    cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_recurso == id)
-    return listar_cargas(cargas, "El recurso ingresado no tiene horas cargadas")
+
+    carga = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_recurso == id).first()
+    
+    if carga == None:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="No existe el registro con el ID ingresado"
+        )
+
+    return carga
 
 def modificar_horas_cargadas(aumentar: bool, id_registro_horas: int, cantidad: int):
     carga = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_registro_horas == id_registro_horas).first()
