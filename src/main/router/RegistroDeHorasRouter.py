@@ -140,6 +140,32 @@ def get_cargas_recurso(
 
     return RegistroDeHorasService.get_cargas_recurso(id_recurso)
 
+@router.get(
+    "/registro/{id_registro_horas}",
+    tags=["rrhh"],
+    status_code=status.HTTP_200_OK,
+    response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
+    dependencies=[Depends(get_db)],
+    summary="Obtener el registro de horas correspondiente al ID"
+)
+def get_registro(
+    id_registro_horas: int = Path(
+        ...,
+    ),
+):
+
+    """
+    ## Obtener el registro correspondiente al ID ingresado
+
+    ### Argumentos
+    - Identificador único de un registro
+
+    ### Retorna
+    - El registro correspondiente al ID ingresado, en caso de existir, en formato JSON
+    """
+
+    return RegistroDeHorasService.get_cargas_id(id_registro_horas)
+
 @router.put(
     "/{id_registro_horas}",
     tags=["rrhh"],
