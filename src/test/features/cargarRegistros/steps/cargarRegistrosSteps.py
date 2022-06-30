@@ -115,7 +115,7 @@ def step_impl(context, cantidad, fecha):
             with mock.patch('src.main.service.RecursosService.get_recurso_legajo', return_value = RecursoSchema.Recurso):
                 try: 
                     context.carga = RegistroDeHorasService.cargarHoras(carga)
-                except RecursoNoAsignado:
+                except RecursoNoAsignado and HTTPException:
                     print('El recurso ingresado no está asignado a la tarea')
         
 @then(u'la carga debe ser denegada')
@@ -189,7 +189,7 @@ def step_impl(context, cantidad, fecha):
 
     try:
         context.carga = RegistroDeHorasService.cargarHoras(carga)
-    except CargaInvalida:
+    except CargaInvalida and HTTPException:
         print('No es posible realizar la carga, la cantidad de horas ingresada no es válida')
 
 @then(u'la carga debe ser denegada por superar el límite diario')
@@ -211,7 +211,7 @@ def step_impl(context, cantidad, fecha):
 
     try:
         context.carga = RegistroDeHorasService.cargarHoras(carga)
-    except FechaInvalida:
+    except FechaInvalida and HTTPException:
         print('La fecha ingresada no es válida, por favor ingrese una fecha que ya haya pasado')
     
 @then(u'la carga debe ser denegada por no ser para una fecha del pasado')

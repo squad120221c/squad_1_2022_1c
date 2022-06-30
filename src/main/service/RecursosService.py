@@ -23,9 +23,9 @@ def get_recursos():
     for recurso in recursos:
         listaRecursos.append(
             RecursoSchema.Recurso(
-                legajo = recurso.get("legajo"),
-                nombre = recurso.get("Nombre"),
-                apellido = recurso.get("Apellido")
+                id = recurso.get("legajo"),
+                name = recurso.get("Nombre"),
+                lastname = recurso.get("Apellido")
             )
         )
 
@@ -49,9 +49,9 @@ def get_recurso_legajo(legajo: int):
     for recurso in recursos:
         if recurso.get("legajo") == legajo:
             recurso_legajo = RecursoSchema.Recurso(
-                legajo = recurso.get("legajo"),
-                nombre = recurso.get("Nombre"),
-                apellido = recurso.get("Apellido")
+                id = recurso.get("legajo"),
+                name = recurso.get("Nombre"),
+                lastname = recurso.get("Apellido")
             )
 
     return recurso_legajo    

@@ -68,7 +68,7 @@ def get_cargas():
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
     dependencies=[Depends(get_db)],
-    summary="Obtener todas los registros de horas de un proyecto"
+    summary="Obtener todos los registros de horas de un proyecto"
 )
 def get_cargas_recurso(
     id_proyecto: int = Path(
@@ -83,7 +83,7 @@ def get_cargas_recurso(
     - Identificador único del proyecto
 
     ### Retorna
-    - Todas los registros realizados en el proyecto en formato JSON
+    - Todos los registros realizados en el proyecto en formato JSON
     """
 
     return RegistroDeHorasService.get_cargas_proyecto(id_proyecto)
@@ -94,7 +94,7 @@ def get_cargas_recurso(
     status_code=status.HTTP_200_OK,
     response_model=list[RegistroDeHorasSchema.RegistroDeHoras],
     dependencies=[Depends(get_db)],
-    summary="Obtener todas los registros de horas de una tarea"
+    summary="Obtener todos los registros de horas de una tarea"
 )
 def get_cargas_recurso(
     id_tarea: int = Path(
@@ -103,13 +103,13 @@ def get_cargas_recurso(
 ):
 
     """
-    ## Obtener todas loss registros de horas por tarea a partir de su identificador único
+    ## Obtener todos loss registros de horas por tarea a partir de su identificador único
 
     ### Argumentos
     - Identificador único de la tarea
 
     ### Retorna
-    - Todas los registros realizadas para la tarea en formato JSON
+    - Todos los registros realizadas para la tarea en formato JSON
     """
 
     return RegistroDeHorasService.get_cargas_tarea(id_tarea)
@@ -135,7 +135,7 @@ def get_cargas_recurso(
     - Identificador único del recurso
 
     ### Retorna
-    - Todas los registros realizados para el proyecto en formato JSON
+    - Todos los registros realizados para el proyecto en formato JSON
     """
 
     return RegistroDeHorasService.get_cargas_recurso(id_recurso)
@@ -151,7 +151,7 @@ def get_cargas_recurso(
 def update_carga(
     id_registro_horas: int = Path(
         ...,
-    ), carga: RegistroDeHorasSchema.RegistroDeModificar = Body(...)
+    ), carga: RegistroDeHorasSchema.RegistroDeHoras = Body(...)
 ):
 
     """

@@ -2,7 +2,7 @@ from datetime import date
 from pydantic import BaseModel
 from pydantic import Field
 
-class RegistroDeModificar(BaseModel):    
+class RegistroDeHoras(BaseModel):    
     nombre_proyecto: str = Field(
         ...,
         example="Proyecto 1"
@@ -31,8 +31,6 @@ class RegistroDeModificar(BaseModel):
         ...,
         example="6"
     )
-
-class RegistroDeHoras(RegistroDeModificar):
     fecha_trabajada: date = Field(
         ...,
         example="yyyy-mm-dd"

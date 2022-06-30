@@ -19,10 +19,16 @@ def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHoras):
 
     fecha_actual = date.today()
     if carga.fecha_trabajada > fecha_actual:
-        raise FechaInvalida
+        raise FechaInvalida and HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La fecha ingresada no es válida, por favor ingrese una fecha del pasado"
+        )
 
     if carga.cantidad > 8 or carga.cantidad < 1:
-        raise CargaInvalida 
+        raise CargaInvalida and HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La cantidad de horas ingresadas no es válida"
+        )
    
     if TareaService.get_tarea_id(carga.id_tarea) == None:
         raise TareaNoExiste and HTTPException(
@@ -38,7 +44,10 @@ def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHoras):
 
     if TareaService.tareaTieneAsignado(carga.id_tarea, carga.id_recurso) == False:
         msg = "El recurso no está asignado a la tarea"
-        raise RecursoNoAsignado
+        raise RecursoNoAsignado and HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="La tarea seleccionada no tiene asignado al recurso seleccionado"
+        )
     
     getCarga = RegistroDeHorasModel.filter((RegistroDeHorasModel.id_recurso == carga.id_recurso) 
     and (RegistroDeHorasModel.id_tarea == carga.id_tarea) and (RegistroDeHorasModel.fecha_trabajada == carga.fecha_trabajada)).first()
@@ -143,7 +152,7 @@ def modificar_horas_cargadas(aumentar: bool, id_registro_horas: int, cantidad: i
         id_tarea=carga.id_tarea
     )
 
-def modificar_carga(id_registro_horas: int, carga_nueva: RegistroDeHorasSchema.RegistroDeModificar):
+def modificar_carga(id_registro_horas: int, carga_nueva: RegistroDeHorasSchema.RegistroDeHoras):
     carga = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_registro_horas == id_registro_horas).first()
 
     if not carga:
@@ -156,6 +165,7 @@ def modificar_carga(id_registro_horas: int, carga_nueva: RegistroDeHorasSchema.R
     carga.nombre_recurso=carga_nueva.nombre_recurso
     carga.nombre_tarea=carga_nueva.nombre_tarea
     carga.cantidad=carga_nueva.cantidad
+    carga.fecha_trabajada=carga_nueva.fecha_trabajada
     carga.id_proyecto=carga_nueva.id_proyecto
     carga.id_recurso=carga_nueva.id_recurso
     carga.id_tarea=carga_nueva.id_tarea
@@ -170,7 +180,8 @@ def modificar_carga(id_registro_horas: int, carga_nueva: RegistroDeHorasSchema.R
         fecha_trabajada=carga.fecha_trabajada,
         id_proyecto=carga.id_proyecto,
         id_recurso=carga.id_recurso,
-        id_tarea=carga.id_tarea
+        id_tarea=carga.id_tarea,
+        id_registro_horas=carga.id_registro_horas
     )
 
 def delete_carga(id_registro_horas: int):
