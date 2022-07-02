@@ -60,7 +60,7 @@ def tareaTieneAsignado(idTarea: int, idRecurso: int):
         return False
     tieneAsignado = False
     for recurso in tarea.collaborators:
-        if recurso == idRecurso:
+        if recurso.get("id") == idRecurso:
             tieneAsignado = True
     
     return tieneAsignado
