@@ -39,16 +39,6 @@ Para correr los tests, posicionarse en el directorio feature y ejecutar el sigui
 behave file.feature
 ```
 
-# Arquitectura en capas
-
-- model: va el modelo de la app, es decir las clases del modelo de dominio
-
-- API_Layer/Controller: Capa que direcciona los requests. Delega a la capa de lógica de negocio lo que hay que hacer. (controller.py)
-
-- Service: Capa con lógica de negocio. La lógica del modelo, es decir la lógica de las clases que están en model
-
-- Repository: Capa de persistencia y acceso a datos
-
 # Heroku
 
 Para subir la app a Heroku primero descargo Heroku CLI https://devcenter.heroku.com/articles/heroku-cli
@@ -75,9 +65,7 @@ Para pushear a Heroku un repositorio que ya existe
 heroku git:remote -a squad1-rrhh
 ```
 
-La API está desplegada en https://aninfo-rrhh.herokuapp.com/
-
-Doc de la API https://aninfo-rrhh.herokuapp.com/docs
+- [👥 Enlace a la API de Recursos Humanos](https://squad1-rrhh.herokuapp.com/docs)
 
 # APIs con las que interactuamos 
 
