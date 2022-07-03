@@ -49,11 +49,14 @@ def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHoras):
             detail="La tarea seleccionada no tiene asignado al recurso seleccionado"
         )
     
-    getCarga = RegistroDeHorasModel.filter((RegistroDeHorasModel.id_recurso == carga.id_recurso) 
-    and (RegistroDeHorasModel.id_tarea == carga.id_tarea) and (RegistroDeHorasModel.fecha_trabajada == carga.fecha_trabajada)).first()
+    getCarga = RegistroDeHorasModel.select().where((RegistroDeHorasModel.fecha_trabajada==carga.fecha_trabajada) 
+                                                    & (RegistroDeHorasModel.id_recurso == carga.id_recurso) 
+                                                    & (RegistroDeHorasModel.id_tarea == carga.id_tarea)).first()
     if getCarga:
-        msg = "Ya se cargaron horas para la tarea, el recurso y la fecha seleccionada"
-        raise RegistroExistente
+        raise RegistroExistente and HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Ya se cargaron horas para la tarea, el recurso y la fecha seleccionada"
+        )
 
     db_carga = RegistroDeHorasModel(
         nombre_proyecto = carga.nombre_proyecto,
