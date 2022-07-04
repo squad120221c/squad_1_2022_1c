@@ -134,11 +134,45 @@ def get_cargas_id(id_registro_horas: int):
 
 def get_cargas_proyecto(id: int):
     cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_proyecto == id)
-    return listar_cargas(cargas, "El proyecto ingresado no tiene horas cargadas")
+
+    list_cargas = []
+    for carga in cargas:
+        list_cargas.append(
+            RegistroDeHorasSchema.RegistroDeHorasCargar(
+                nombre_proyecto=carga.nombre_proyecto,
+                nombre_tarea=carga.nombre_tarea,
+                nombre_recurso=carga.nombre_recurso,
+                cantidad=carga.cantidad,
+                fecha_trabajada=carga.fecha_trabajada,
+                id_registro_horas=carga.id_registro_horas,
+                id_proyecto = carga.id_proyecto,
+                id_tarea = carga.id_tarea,
+                id_recurso = carga.id_recurso
+            )
+        )
+
+    return list_cargas
 
 def get_cargas_tarea(id: int):
     cargas = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_tarea == id)
-    return listar_cargas(cargas, "La tarea ingresada no tiene horas cargadas")
+
+    list_cargas = []
+    for carga in cargas:
+        list_cargas.append(
+            RegistroDeHorasSchema.RegistroDeHorasCargar(
+                nombre_proyecto=carga.nombre_proyecto,
+                nombre_tarea=carga.nombre_tarea,
+                nombre_recurso=carga.nombre_recurso,
+                cantidad=carga.cantidad,
+                fecha_trabajada=carga.fecha_trabajada,
+                id_registro_horas=carga.id_registro_horas,
+                id_proyecto = carga.id_proyecto,
+                id_tarea = carga.id_tarea,
+                id_recurso = carga.id_recurso
+            )
+        )
+
+    return list_cargas
 
 def get_cargas_recurso(id: int):
 
