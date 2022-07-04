@@ -280,4 +280,4 @@ def horasRegistradas(idRegistro: int):
     except:
         return 0
 
-    return carga[0].cantidad
+    return carga.cantidad

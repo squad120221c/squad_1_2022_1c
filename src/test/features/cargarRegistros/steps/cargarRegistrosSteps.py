@@ -49,15 +49,16 @@ def step_impl(context, idTarea):
 
 @given(u'el recurso está asignado a la tarea')
 def step_impl(context):
-    if context.recurso.legajo not in context.tarea.collaborators:
-        context.tarea.collaborators.append(context.recurso.legajo) 
+
+    if context.recurso.id not in context.tarea.collaborators:
+        context.tarea.collaborators.append(context.recurso.id) 
 
 @given(u'la tarea no tiene horas cargadas del recurso')
 def step_impl(context):
     try: 
         lista_cargas = RegistroDeHorasService.get_cargas()
         for carga in lista_cargas:
-            if(carga.id_recurso==context.recurso.legajo and carga.id_tarea==context.tarea.id):
+            if(carga.id_recurso==context.recurso.id and carga.id_tarea==context.tarea.id):
                 RegistroDeHorasService.delete_carga(carga.id_registro_horas)
     except RegistroNoExiste and HTTPException:
         pass
@@ -72,7 +73,7 @@ def step_impl(context, cantidad, fecha):
         fecha_trabajada=datetime.strptime(fecha, '%Y-%m-%d'),
         id_proyecto=1,
         id_tarea=int(context.tarea.id),
-        id_recurso=int(context.recurso.legajo)
+        id_recurso=int(context.recurso.id)
     )    
 
     #Tuve que hacer un mock de esta función porque si no hacía una consulta a la API de proyectos
@@ -93,8 +94,8 @@ def step_impl(context, cantidad):
 
 @given(u'el recurso no está asignado a la tarea')
 def step_impl(context):
-    if(context.recurso.legajo in context.tarea.collaborators):
-        context.tarea.collaborators.remove(context.recurso.legajo)
+    if(context.recurso.id in context.tarea.collaborators):
+        context.tarea.collaborators.remove(context.recurso.id)
 
 @when(u'intento cargar {cantidad} horas trabajadas a la tarea del recurso que no tiene asignado para la fecha {fecha}')
 def step_impl(context, cantidad, fecha):
@@ -106,7 +107,7 @@ def step_impl(context, cantidad, fecha):
         fecha_trabajada=datetime.strptime(fecha, '%Y-%m-%d'),
         id_proyecto=1,
         id_tarea=int(context.tarea.id),
-        id_recurso=int(context.recurso.legajo)
+        id_recurso=int(context.recurso.id)
     )    
 
     #Tuve que hacer un mock de esta función porque si no hacía una consulta a la API de proyectos
@@ -124,7 +125,7 @@ def step_impl(context):
 
 @then(u'la tarea tendrá 0 horas consumidas del recurso')
 def step_impl(context):
-    assert RegistroDeHorasService.horasConsumidasDeRecurso(context.tarea.id, context.recurso.legajo) == 0
+    assert RegistroDeHorasService.horasConsumidasDeRecurso(context.tarea.id, context.recurso.id) == 0
 
 @when(u'intento cargar {cantidad} horas trabajadas a una tarea que no existe para la fecha {fecha}')
 def step_impl(context, cantidad, fecha):
@@ -136,7 +137,7 @@ def step_impl(context, cantidad, fecha):
         fecha_trabajada=datetime.strptime(fecha, '%Y-%m-%d'),
         id_proyecto=1,
         id_tarea=-1,
-        id_recurso=int(context.recurso.legajo)
+        id_recurso=int(context.recurso.id)
     )
 
     with mock.patch('src.main.service.TareaService.get_tarea_id') as mock_func:
@@ -184,7 +185,7 @@ def step_impl(context, cantidad, fecha):
         fecha_trabajada=datetime.strptime(fecha, '%Y-%m-%d'),
         id_proyecto=1,
         id_tarea=int(context.tarea.id),
-        id_recurso=int(context.recurso.legajo)
+        id_recurso=int(context.recurso.id)
     )    
 
     try:
@@ -206,7 +207,7 @@ def step_impl(context, cantidad, fecha):
         fecha_trabajada=datetime.strptime(fecha, '%Y-%m-%d'),
         id_proyecto=1,
         id_tarea=int(context.tarea.id),
-        id_recurso=int(context.recurso.legajo)
+        id_recurso=int(context.recurso.id)
     )    
 
     try:
