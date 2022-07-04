@@ -1,85 +1,101 @@
-Feature: modificacion de horas
+Feature: modificación registro de horas
+    
+    Scenario Outline: aumento horas cargadas de un recurso a una tarea
+        Given un recurso con ID <idRecurso> 
+        And una tarea con ID <idTarea>
+        And el recurso está asignado a la tarea
+        And se registraron <cantidadInicial> horas del recurso en la tarea
+        When se intenta aumentar las horas trabajadas del recurso a la tarea a <cantidadNueva> horas
+        Then la tarea tendrá <cantidadFinal> horas consumidas del recurso
+
+    Examples:
+        | idRecurso | idTarea | cantidadInicial | cantidadNueva | cantidadFinal |
+        | 1         | 3       | 2               | 4             | 4             |
+        | 2         | 5       | 1               | 3             | 3             |
+        | 3         | 7       | 5               | 8             | 8             |
 
     Scenario Outline: disminuyo horas cargadas de un recurso a una tarea
-        Given un recurso con ID <id> 
-        And una tarea con título <tituloTarea>
+        Given un recurso con ID <idRecurso> 
+        And una tarea con ID <idTarea>
         And el recurso está asignado a la tarea
-        And el recurso tiene <cantidadInicial> horas cargadas en la tarea
-        When se intenta disminuir las horas trabajadas del recurso a la tarea en <cantidad>
+        And se registraron <cantidadInicial> horas del recurso en la tarea
+        When se intenta disminuir las horas trabajadas del recurso a la tarea a <cantidadNueva> horas
         Then la tarea tendrá <cantidadFinal> horas consumidas del recurso
 
     Examples:
-        | id | tituloTarea   | cantidadInicial | cantidad | cantidadFinal |
-        | 2  | "Refactorizar"| 5               | 2        | 3             |
-        | 5  | "Debuggear"   | 3               | 3        | 0             |
-        | 0  | "Testing"     | 8               | 5        | 3             |
+        | idRecurso | idTarea | cantidadInicial | cantidadNueva | cantidadFinal |
+        | 2         | 5       | 5               | 2             | 2             |
+        | 5         | 2       | 3               | 2             | 2             |
+        | 0         | 8       | 8               | 5             | 5             |
 
+    Scenario Outline: no se pueden modificar un registro que no existe
+        Given que no existe un registro con ID <idRegistro>
+        When se intenta modificar el registro
+        Then la modificación debe ser denegada
+
+    Examples:
+        | idRegistro |
+        | 0          |
+        | 1          |
+        | 2          |
+
+    Scenario Outline: cambio exitosamente la tarea de un registro
+        Given un recurso con ID <idRecurso> 
+        And una tarea con ID <idTareaInicial>
+        And una tarea con ID <idTareaFinal>
+        And existe un registro de la tarea <idRecurso> y el recurso <idTareaInicial>
+        And el recurso está asignado a la tarea
+        When se intenta modificar la tarea a la tarea con ID <idTareaFinal>
+        Then el registro tendrá la tarea con id <idTareaFinal>
+
+    Examples:
+        | idRecurso | idTareaInicial | idTareaFinal |
+        | 2         | 92             |  56          |
+        | 23        | 2              |  6           |
+        | 16        | 0              |  621         |
 
     Scenario Outline: aumento horas cargadas de un recurso a una tarea
-        Given un recurso con ID <id> 
-        And una tarea con título <tituloTarea>
+        Given un recurso con ID <idRecurso> 
+        And una tarea con ID <idTareaInicial>
+        And una tarea con ID <idTareaFinal>
+        And existe un registro de la tarea <idRecurso> y el recurso <idTareaInicial>
+        And el recurso no está asignado a la tarea
+        When se intenta modificar la tarea a la tarea con ID <idTareaFinal>
+        Then la modificación debe ser denegada
+        And el registro tendrá la tarea con id <idTareaInicial>
+
+    Examples:
+        | idRecurso | idTareaInicial | idTareaFinal |
+        | 4         | 2              |  5           |
+        | 6         | 7              |  3           |
+        | 5         | 9              |  9           |
+
+    Scenario Outline: falla al intentar disminuir la cantidad de horas a un valor menor a 1
+        Given un recurso con ID <idRecurso> 
+        And una tarea con ID <idTarea>
         And el recurso está asignado a la tarea
-        And el recurso tiene <cantidadInicial> horas cargadas en la tarea
-        When se intenta aumentar las horas trabajadas del recurso a la tarea en <cantidad>
-        Then la tarea tendrá <cantidadFinal> horas consumidas del recurso
+        And se registraron <cantidadInicial> horas del recurso en la tarea
+        When se intenta disminuir las horas trabajadas del recurso a la tarea a <cantidadNueva> horas
+        Then la modificación es denegeada 
+        And la cantidad de horas permanece en <cantidadInicial>
 
     Examples:
-        | id | tituloTarea   | cantidadInicial | cantidad | cantidadFinal |
-        | 1  | "Refactorizar"| 2               | 2        | 4             |
-        | 2  | "Debuggear"   | 1               | 3        | 4             |
-        | 3  | "Testing"     | 5               | 3        | 8             |
+        | idRecurso | idTarea | cantidadInicial | cantidadNueva |
+        | 2         | 5       | 5               | 0             |
+        | 5         | 2       | 3               | -1            |
+        | 0         | 8       | 8               | -5            |
 
-
-    Scenario Outline: no se pueden modificar horas de un recurso a una tarea que no existe
-        Given un recurso con ID <id>
-        And el recurso realiza un trabajo sobre una tarea que no existe
-        When se intenta aumentar <cantidad> horas trabajadas del recurso a una tarea que no existe
-        Then la carga debe ser denegada por ingresar mal la tarea
-
-    Examples:
-        | id | cantidad |
-        | 0  | 1        |
-        | 1  | 0        |
-        | 2  | 7        |   
-
-    Scenario Outline: no se pueden modificar horas de un recurso a un recurso que no existe
-        Given una tarea con título <tituloTarea>
-        And se realiza un trabajo sobre la tarea 
-        When se intenta aumentar <cantidad> horas trabajadas de un recurso que no existe a la tarea
-        Then la carga debe ser denegada por ingresar mal la tarea
-
-    Examples:
-        | tituloTarea          | cantidad |
-        | "Modelo de Dominio"  | 1        |
-        | "Diagrma de clases"  | 0        |
-        | "Arreglar bug main"  | 7        | 
-
-    Scenario Outline: no puedo disminuir las horas en una cantidad mayor a las que están cargadas
-        Given un recurso con ID <id> 
-        And una tarea con título <tituloTarea>
+    Scenario Outline: falla al intentar aumentar la cantidad de horas a un valor mayor a 8
+        Given un recurso con ID <idRecurso> 
+        And una tarea con ID <idTarea>
         And el recurso está asignado a la tarea
-        And el recurso tiene <cantidadInicial> horas cargadas en la tarea
-        When se intenta disminuir las horas trabajadas del recurso a la tarea en <cantidad>
-        Then la modificación debe ser denegada por superar la cantidad de horas cargadas a disminuir
-        And la tarea tendrá <cantidadInicial> horas consumidas del recurso
+        And se registraron <cantidadInicial> horas del recurso en la tarea
+        When se intenta aumentar las horas trabajadas del recurso a la tarea a <cantidadNueva> horas
+        Then la modificación es denegeada 
+        And la cantidad de horas permanece en <cantidadInicial>
 
     Examples:
-        | id | tituloTarea   | cantidadInicial | cantidad |
-        | 1  | "Refactorizar"| 5               | 7        |
-        | 2  | "Debuggear"   | 1               | 2        |
-        | 3  | "Testing"     | 2               | 5        |
-
-    Scenario Outline: no puedo aumentar la cantidad de horas y superar las 8 horas diarias
-        Given un recurso con ID <id> 
-        And una tarea con título <tituloTarea>
-        And el recurso está asignado a la tarea
-        And el recurso tiene <cantidadInicial> horas cargadas en la tarea el día <fecha>
-        When se intenta aumentar <cantidad> la cantidad horas trabajadas superando el límite diario
-        Then la modificación debe ser denegada por superar el límite de carga diario
-        And la tarea tendrá <cantidadInicial> horas consumidas del recurso
-
-    Examples:
-        | id | tituloTarea   | cantidadInicial | fecha      |cantidad  |
-        | 7  | "Refactorizar"| 5               | 10-06-2022 | 4        |
-        | 2  | "Debuggear"   | 6               | 24-12-2019 | 4        |
-        | 83 | "Testing"     | 2               | 27-07-2017 | 7        |
+        | idRecurso | idTarea | cantidadInicial | cantidadNueva |
+        | 3         | 4       | 5               | 9             |
+        | 5         | 2       | 3               | 12            |
+        | 0         | 8       | 8               | 15            |

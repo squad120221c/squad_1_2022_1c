@@ -1,0 +1,2 @@
+class CantidadInvalida(Exception):
+    pass

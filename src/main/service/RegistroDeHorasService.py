@@ -8,6 +8,7 @@ from src.main.exceptions.RegistroExistente import RegistroExistente
 from src.main.exceptions.RecursoNoAsignado import RecursoNoAsignado
 from src.main.exceptions.RegistroNoExiste import RegistroNoExiste
 from src.main.exceptions.RecursoNoExiste import RecursoNoExiste
+from src.main.exceptions.CantidadInvalida import CantidadInvalida
 
 from src.main.model.RegistroDeHorasModel import RegistroDeHoras as RegistroDeHorasModel 
 from src.main.schema import RegistroDeHorasSchema 
@@ -84,11 +85,11 @@ def cargarHoras(carga: RegistroDeHorasSchema.RegistroDeHoras):
     )
 
 def listar_cargas(cargas, msg):
-    if not cargas:
-        raise RegistroNoExiste and HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=msg
-        )
+    # if not cargas:
+    #     raise RegistroNoExiste and HTTPException(
+    #         status_code=status.HTTP_404_NOT_FOUND,
+    #         detail=msg
+    #     )
 
     list_cargas = []
     for carga in cargas:
@@ -202,7 +203,7 @@ def modificar_horas_cargadas(aumentar: bool, id_registro_horas: int, cantidad: i
 
     carga.save()
 
-    return RegistroDeHorasSchema.RegistroDeHorasCargar(
+    return RegistroDeHorasSchema.RegistroDeHoras(
         nombre_proyecto=carga.nombre_proyecto,
         nombre_recurso=carga.nombre_recurso,
         nombre_tarea=carga.nombre_tarea,
@@ -214,6 +215,13 @@ def modificar_horas_cargadas(aumentar: bool, id_registro_horas: int, cantidad: i
     )
 
 def modificar_carga(id_registro_horas: int, carga_nueva: RegistroDeHorasSchema.RegistroDeHoras):
+
+    if int(carga_nueva.cantidad) > 8 or int(carga_nueva.cantidad) < 1:
+        raise CantidadInvalida()
+
+    if TareaService.tareaTieneAsignado(carga_nueva.id_tarea, carga_nueva.id_recurso) == False:
+        raise RecursoNoAsignado()
+    
     carga = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_registro_horas == id_registro_horas).first()
 
     if not carga:
@@ -249,7 +257,7 @@ def delete_carga(id_registro_horas: int):
     carga = RegistroDeHorasModel.filter(RegistroDeHorasModel.id_registro_horas == id_registro_horas).first()
 
     if not carga:
-         raise RegistroNoExiste()
+        raise RegistroNoExiste()
 
     carga.delete_instance()
 
